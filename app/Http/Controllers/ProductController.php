@@ -9,6 +9,27 @@ use Illuminate\Http\RedirectResponse;
 
 class ProductController extends Controller
 {
+
+
+    function __construct()
+    {
+        // users need to have at least one or more of the following permissions to be able to access the foplloowing functions
+        $this->middleware('permission:product-list|product-create|product-edit|product-delete', ['only' => ['index', 'show']]);
+        $this->middleware('permission:product-create', ['only' => ['create', 'store']]);
+        $this->middleware('permission:product-edit', ['only' => ['edit', 'update']]);
+        $this->middleware('permission:product-delete', ['only' => ['destroy']]);
+    }
+
+
+
+    public function index(): View
+    {
+        $products = Products::latest()->paginate(5);
+        return view('products.index', compact('products'))
+            ->with('i', (request()->input('page', 1) - 1) * 5);
+    }
+
+
     public function create(): View
     {
         return view('products.create');
